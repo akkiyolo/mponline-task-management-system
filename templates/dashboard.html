@@ -1,0 +1,283 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard – Task Manager{% endblock %}
+
+{% block body %}
+<div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 11l3 3L22 4"/>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+            </svg>
+            <span>Task Manager</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard') }}" class="nav-item active" id="nav-dashboard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7"/>
+                    <rect x="14" y="3" width="7" height="7"/>
+                    <rect x="14" y="14" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/>
+                </svg>
+                <span>Dashboard</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="admin-badge">
+                <div class="admin-avatar">A</div>
+                <div class="admin-info">
+                    <span class="admin-name">{{ current_user.username }}</span>
+                    <span class="admin-role">Administrator</span>
+                </div>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn btn-ghost btn-logout" id="logout-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle sidebar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+            <h2 class="page-title">Dashboard</h2>
+            <div class="topbar-right">
+                <span class="current-date" id="current-date"></span>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <section class="stats-grid">
+            <div class="stat-card stat-total" id="stat-total">
+                <div class="stat-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-number">{{ total }}</span>
+                    <span class="stat-label">Total Tasks</span>
+                </div>
+            </div>
+
+            <div class="stat-card stat-completed" id="stat-completed">
+                <div class="stat-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-number">{{ completed }}</span>
+                    <span class="stat-label">Completed</span>
+                </div>
+            </div>
+
+            <div class="stat-card stat-pending" id="stat-pending">
+                <div class="stat-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-number">{{ pending }}</span>
+                    <span class="stat-label">Pending</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Task Form Section -->
+        <section class="content-section">
+            <div class="section-header">
+                <h3>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    Add New Task
+                </h3>
+            </div>
+            <form method="POST" action="{{ url_for('add_task') }}" class="task-form" id="add-task-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="employee_name">Employee Name</label>
+                        <input type="text" id="employee_name" name="employee_name" placeholder="Enter employee name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="task_title">Task Title</label>
+                        <select id="task_title" name="task_title" required>
+                            <option value="" disabled selected>Select a task</option>
+                            <option value="Task 1">Task 1</option>
+                            <option value="Task 2">Task 2</option>
+                            <option value="Task 3">Task 3</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="completed">Completed</label>
+                        <select id="completed" name="completed">
+                            <option value="false" selected>False</option>
+                            <option value="true">True</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group form-actions">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn btn-primary" id="submit-task-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                            <span>Submit</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <!-- Task Table Section -->
+        <section class="content-section">
+            <div class="section-header">
+                <h3>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="8" y1="6" x2="21" y2="6"/>
+                        <line x1="8" y1="12" x2="21" y2="12"/>
+                        <line x1="8" y1="18" x2="21" y2="18"/>
+                        <line x1="3" y1="6" x2="3.01" y2="6"/>
+                        <line x1="3" y1="12" x2="3.01" y2="12"/>
+                        <line x1="3" y1="18" x2="3.01" y2="18"/>
+                    </svg>
+                    All Tasks
+                </h3>
+                <span class="task-count-badge">{{ tasks|length }} task{{ 's' if tasks|length != 1 }}</span>
+            </div>
+
+            {% if tasks %}
+            <div class="table-wrapper">
+                <table class="task-table" id="task-table">
+                    <thead>
+                        <tr>
+                            <th>Task ID</th>
+                            <th>Employee Name</th>
+                            <th>Task Title</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks %}
+                        <tr class="task-row {% if task.completed %}row-completed{% endif %}" id="task-row-{{ task.task_id }}">
+                            <td>
+                                <span class="task-id-badge">#{{ task.task_id }}</span>
+                            </td>
+                            <td>
+                                <div class="employee-cell">
+                                    <div class="employee-avatar">{{ task.employee_name[0]|upper }}</div>
+                                    <span>{{ task.employee_name }}</span>
+                                </div>
+                            </td>
+                            <td>{{ task.task_title }}</td>
+                            <td>
+                                <button class="status-badge {% if task.completed %}status-done{% else %}status-pending{% endif %}"
+                                        onclick="toggleTask({{ task.task_id }})"
+                                        id="status-btn-{{ task.task_id }}">
+                                    {{ 'Completed' if task.completed else 'Pending' }}
+                                </button>
+                            </td>
+                            <td class="date-cell">{{ task.created_at.strftime('%d %b %Y') }}</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn-icon btn-edit" onclick="openEditModal({{ task.task_id }}, '{{ task.employee_name }}', '{{ task.task_title }}', {{ 'true' if task.completed else 'false' }})" id="edit-btn-{{ task.task_id }}" aria-label="Edit task">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                        </svg>
+                                    </button>
+                                    <form method="POST" action="{{ url_for('delete_task', task_id=task.task_id) }}" class="inline-form" onsubmit="return confirm('Delete task #{{ task.task_id }}?')">
+                                        <button type="submit" class="btn-icon btn-delete" id="delete-btn-{{ task.task_id }}" aria-label="Delete task">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="3 6 5 6 21 6"/>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                                <line x1="10" y1="11" x2="10" y2="17"/>
+                                                <line x1="14" y1="11" x2="14" y2="17"/>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state" id="empty-state">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                <h4>No tasks yet</h4>
+                <p>Create your first task using the form above.</p>
+            </div>
+            {% endif %}
+        </section>
+    </main>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="edit-modal">
+    <div class="modal-card" id="edit-modal-card">
+        <div class="modal-header">
+            <h3>Edit Task <span id="edit-task-id-label"></span></h3>
+            <button class="modal-close" onclick="closeEditModal()" id="close-modal-btn">&times;</button>
+        </div>
+        <form method="POST" id="edit-form">
+            <div class="form-group">
+                <label for="edit_employee_name">Employee Name</label>
+                <input type="text" id="edit_employee_name" name="employee_name" required>
+            </div>
+            <div class="form-group">
+                <label for="edit_task_title">Task Title</label>
+                <select id="edit_task_title" name="task_title" required>
+                    <option value="Task 1">Task 1</option>
+                    <option value="Task 2">Task 2</option>
+                    <option value="Task 3">Task 3</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="edit_completed">Completed</label>
+                <select id="edit_completed" name="completed">
+                    <option value="false">False</option>
+                    <option value="true">True</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-ghost" onclick="closeEditModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="save-edit-btn">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
