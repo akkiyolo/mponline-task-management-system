@@ -1,5 +1,6 @@
 # 📋 Task Management Web App
-![Uploading image.png…]()
+<img width="1878" height="922" alt="image" src="https://github.com/user-attachments/assets/cc51ee8a-d970-4b87-afaf-d4aef98cb5ea" />
+
 
 
 A modern, full-featured task management system built with **Flask**, **HTML/CSS/JS**, and **SQLite**. Designed for administrators to assign, track, and manage employee tasks through a sleek dark-mode dashboard.
